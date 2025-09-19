@@ -1,7 +1,5 @@
 package com.brittany.sprinboot_manager_task.exceptions;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -11,44 +9,49 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.brittany.sprinboot_manager_task.DTOs.Response.ErrorResponseDTO;
+import com.brittany.sprinboot_manager_task.utils.ErrorResponseFactory;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final ErrorResponseFactory errorResponseFactory;
+
+    public GlobalExceptionHandler(ErrorResponseFactory errorResponseFactory) {
+        this.errorResponseFactory = errorResponseFactory;
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleAllExceptions(Exception ex, HttpServletRequest request) {
-        HttpStatus error = HttpStatus.INTERNAL_SERVER_ERROR;
-        ErrorResponseDTO response = mapErrorResponseDTO(error.value(), error.name(), ex.getMessage(),
+        HttpStatus errorStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        ErrorResponseDTO response = errorResponseFactory.build(errorStatus.value(), errorStatus.name(), ex.getMessage(),
                 request.getRequestURI(), null);
 
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, errorStatus);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex,
             HttpServletRequest request) {
-        HttpStatus error = HttpStatus.BAD_REQUEST;
-        ErrorResponseDTO response = mapErrorResponseDTO(error.value(), error.name(), ex.getMessage(),
+        HttpStatus errorStatus = HttpStatus.BAD_REQUEST;
+        // ErrorResponseDTO response = mapErrorResponseDTO(errorStatus.value(),
+        // errorStatus.name(), ex.getMessage(),
+        // request.getRequestURI(),
+        // ex.getBindingResult()
+        // .getFieldErrors()
+        // .stream()
+        // .map(fieldError -> fieldError.getField() + ": " +
+        // fieldError.getDefaultMessage())
+        // .collect(Collectors.toList()));
+
+        ErrorResponseDTO response = errorResponseFactory.build(errorStatus.value(), errorStatus.name(), ex.getMessage(),
                 request.getRequestURI(),
-                ex.getBindingResult()
-                        .getFieldErrors()
-                        .stream()
-                        .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                ex.getBindingResult().getFieldErrors().stream()
+                        .map((fieldE) -> fieldE.getField() + " : " + fieldE.getDefaultMessage())
                         .collect(Collectors.toList()));
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    private ErrorResponseDTO mapErrorResponseDTO(int status, String error, String message, String path,
-            List<String> details) {
-        return ErrorResponseDTO.builder()
-                .status(status)
-                .mensaje(message)
-                .path(path)
-                .timestamp(LocalDateTime.now())
-                .details(details)
-                .build();
+        return new ResponseEntity<>(response, errorStatus);
     }
 }
