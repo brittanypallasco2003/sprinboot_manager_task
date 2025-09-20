@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import com.brittany.sprinboot_manager_task.models.EstadoTareaEnum;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({ "userId", "titulo", "description", "estado", "createdAt", "updatedAt" })
-public record TareaResponseDTO(Long userId, String titulo, String description, EstadoTareaEnum estado,
-        LocalDateTime createdAt, LocalDateTime updatedAt) {
+@JsonPropertyOrder({ "id", "titulo", "description", "estado", "createdAt", "updatedAt", "userId" })
+public record TareaResponseDTO(Long id, String titulo, String description, EstadoTareaEnum estado,
+        LocalDateTime createdAt, LocalDateTime updatedAt, Long userId) {
 }
