@@ -65,7 +65,9 @@ public class JwtTokenValidator extends OncePerRequestFilter {
     
             Map<String, Object> body = new LinkedHashMap<>();
             body.put("status", HttpStatus.UNAUTHORIZED.value());
+            body.put("error", HttpStatus.UNAUTHORIZED.name());
             body.put("message", "Token inválido: "+e.getMessage());
+            body.put("path", request.getRequestURI());
             body.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) );
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
