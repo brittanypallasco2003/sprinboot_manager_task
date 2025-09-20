@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +16,7 @@ import com.brittany.sprinboot_manager_task.utils.ErrorResponseFactory;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
+@Order(2)
 public class GlobalExceptionHandler {
 
     private final ErrorResponseFactory errorResponseFactory;
@@ -26,7 +26,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    @Order(20)
     public ResponseEntity<?> handleAllExceptions(Exception ex, HttpServletRequest request) {
         HttpStatus errorStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -51,17 +50,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, status);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException ex,
             HttpServletRequest request) {
 
-        HttpStatus errorStatus = HttpStatus.BAD_REQUEST;
-        String message = "Error al leer el cuerpo de la solicitud. Verifique el formato del JSON.";
+        HttpStatus errorStatus = HttpStatus.NOT_FOUND;
 
         ErrorResponseDTO response = errorResponseFactory.build(
                 errorStatus.value(),
                 errorStatus.name(),
-                message,
+                ex.getMessage(),
                 request.getRequestURI(),
                 null
         );
