@@ -3,6 +3,7 @@ package com.brittany.sprinboot_manager_task.services;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.brittany.sprinboot_manager_task.exceptions.ResourceNotFoundException;
 import com.brittany.sprinboot_manager_task.models.UsuarioModel;
 import com.brittany.sprinboot_manager_task.repositories.UsuarioRepository;
 
@@ -19,7 +20,7 @@ public class AuthenticatedUserServiceImpl implements AuthenticatedUserServiceI {
     public UsuarioModel getCurrentUser() {
         String username = getCurrentUsername();
         return userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("Usuario autenticado no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
     }
 
     @Override
