@@ -12,6 +12,7 @@ Base URL: `http://localhost:8080/api/v1`
 - [Tecnologías utilizadas](#tecnologías-utilizadas)
 - [Instalación local con Docker Compose](#instalación-local-con-docker-compose)
   - [Variables de Entorno](#variables-de-entorno)
+- [Postman](#postman)
 - [Documentación](#documentación)
   - [Usuarios](#usuarios)
     - [Registrar usuario](#registrar-usuario)
@@ -67,10 +68,10 @@ Es obligatorio editarlo antes de ejecutar el proyecto, y reemplazar los valores 
 
 | Variable                | Descripción                                                                                                      |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `POSTGRES_DB`        | Nombre de la base de datos que usará la aplicación.                                                              |
-| `POSTGRES_USER`            | Usuario que la aplicación utilizará para acceder a la base de datos.                                             |
-| `POSTGRES_PASSWORD`        | Contraseña del usuario especificado en `POSTGRES_USER`.                                                             |
-| `SPRING_DATASOURCE_URL` | URL de conexión a la base de datos (generalmente `jdbc:mysql://db:3306/nombre_bd` cuando se usa Docker Compose). |
+| `SPRING_DATASOURCE_DB`        | Nombre de la base de datos que usará la aplicación.                                                              |
+| `SPRING_DATASOURCE_USERNAME`            | Usuario que la aplicación utilizará para acceder a la base de datos.                                             |
+| `SPRING_DATASOURCE_PASSWORD`        | Contraseña del usuario especificado en `SPRING_DATASOURCE_USERNAME`.                                                             |
+| `SPRING_DATASOURCE_URL` | URL de conexión a la base de datos (generalmente `jdbc:mysql://db:5432/nombre_bd` cuando se usa Docker Compose). |
 | `JWT_SECRET`            | Clave secreta utilizada para firmar y validar los tokens JWT.                                                    |
 | `USER_GENERATOR`        | Entidad firmante del token                                                                                       |
 
@@ -83,6 +84,10 @@ docker-compose up --build
 
 5. Las tablas se crearán automáticamente gracias a JPA/Hibernate (no hay datos iniciales insertados).
 
+
+## Postman
+> [!NOTE]  
+> Se incluye una colección Postman ["API_Manager_tasks.postman_collection"](./docs/API_Manager_tasks.postman_collection.json) para probar todos los endpoints expuestos a continuación
 
 ## Documentación
 
