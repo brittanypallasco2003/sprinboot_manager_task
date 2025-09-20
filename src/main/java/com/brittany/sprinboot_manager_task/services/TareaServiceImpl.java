@@ -1,14 +1,15 @@
 package com.brittany.sprinboot_manager_task.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.brittany.sprinboot_manager_task.DTOs.Request.TareaRequestDTO;
 import com.brittany.sprinboot_manager_task.DTOs.Response.TareaResponseDTO;
+import com.brittany.sprinboot_manager_task.exceptions.ResourceNotFoundException;
 import com.brittany.sprinboot_manager_task.models.TareaModel;
 import com.brittany.sprinboot_manager_task.models.UsuarioModel;
 import com.brittany.sprinboot_manager_task.repositories.TareaRepository;
@@ -37,9 +38,15 @@ public class TareaServiceImpl implements TareaServiceI {
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<TareaResponseDTO> getTaskById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTaskById'");
+    public TareaResponseDTO getTaskById(Long id) {
+        TareaModel tareaDb = tareaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada"));
+
+        if (!authenticatedUserService.isCurrentUser(tareaDb.getUsuario().getId())) {
+            throw new AccessDeniedException("No tienes permitido acceder a esta tarea");
+        }
+        return mapResponseDTO(tareaDb);
+
     }
 
     @Transactional
@@ -60,27 +67,44 @@ public class TareaServiceImpl implements TareaServiceI {
 
     }
 
+    @Transactional
     @Override
-    public Optional<TareaResponseDTO> updateTask(TareaRequestDTO dto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateTask'");
+    public TareaResponseDTO updateTask(Long id, TareaRequestDTO dto) {
+        TareaModel tareaDb = tareaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada"));
+        if (!authenticatedUserService.isCurrentUser(tareaDb.getUsuario().getId())) {
+            throw new AccessDeniedException("No tienes permitido editar esta tarea");
+        }
+        tareaDb.setTitulo(dto.titulo());
+        tareaDb.setDescription(dto.descripcion());
+        tareaDb.setEstado(dto.estado());
+
+        TareaModel tareaUpdated = tareaRepository.saveAndFlush(tareaDb);
+
+        return mapResponseDTO(tareaUpdated);
+
     }
 
+    @Transactional
     @Override
     public void deleteTask(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteTask'");
+        TareaModel tareaDb = tareaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada"));
+        if (!authenticatedUserService.isCurrentUser(tareaDb.getUsuario().getId())) {
+            throw new AccessDeniedException("No tienes permitido eliminar esta tarea");
+        }
+        tareaRepository.delete(tareaDb);
     }
 
     private TareaResponseDTO mapResponseDTO(TareaModel tarea) {
         return new TareaResponseDTO(
-            tarea.getId(),
-            tarea.getTitulo(),
-            tarea.getDescription(),
-            tarea.getEstado(),
-            tarea.getCreatedAt(),
-            tarea.getUpdatedAt(),
-            tarea.getUsuario().getId());
+                tarea.getId(),
+                tarea.getTitulo(),
+                tarea.getDescription(),
+                tarea.getEstado(),
+                tarea.getCreatedAt(),
+                tarea.getUpdatedAt(),
+                tarea.getUsuario().getId());
     }
 
 }
