@@ -38,7 +38,8 @@ public class TareaModel {
     private UsuarioModel usuario;
 
     @Builder
-    public TareaModel(String titulo, String description, EstadoTareaEnum estado, UsuarioModel usuario) {
+    public TareaModel(Long id, String titulo, String description, EstadoTareaEnum estado, UsuarioModel usuario) {
+        this.id=id;
         this.titulo = titulo;
         this.description = description;
         this.estado = estado;
